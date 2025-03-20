@@ -1,0 +1,3 @@
+user can change .defaults but should not remove default_cover.jpg
+
+inform user that ~180 requests per sec will rate limit them, 0.6 is a good middle ground at 100 req/min

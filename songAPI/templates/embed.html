@@ -1,0 +1,103 @@
+<!doctype html>
+<html style="margin: 0; padding: 0; overflow: hidden; background: transparent">
+    <head>
+        <title>{{ title }}</title>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    </head>
+    <body
+        style="margin: 0; padding: 0; overflow: hidden; background: transparent"
+    >
+        <div
+            id="container"
+            style="
+                background-color: pink;
+                border: 2px solid black;
+                padding: 10px;
+                width: 300px;
+                text-align: center;
+                color: black;
+                font-family: Arial, Helvetica, sans-serif;
+                box-sizing: border-box;
+                border-radius: 15px;
+            "
+        >
+            <div
+                id="cover"
+                style="padding: 5px; display: flex; justify-content: center"
+            >
+                <img
+                    id="album-cover"
+                    style="
+                        border: 2px solid black;
+                        max-width: 100%;
+                        min-width: 100%;
+                        display: block;
+                        margin: auto;
+                        border-radius: 15px;
+                    "
+                    src="{{ cover }}"
+                    alt="{{ title }}"
+                />
+            </div>
+            <div id="info">
+                <marquee
+                    behavior="scroll"
+                    direction="left"
+                    id="song"
+                    style="
+                        font-size: 18px;
+                        font-weight: bold;
+                        margin: 10px 0 5px 0;
+                        white-space: nowrap;
+                    "
+                >
+                    {{ artists }} - {{ title }}
+                </marquee>
+                <div
+                    id="progress"
+                    style="
+                        font-size: 18px;
+                        font-weight: bold;
+                        margin: 10px 0 5px 0;
+                        white-space: nowrap;
+                        overflow-x: auto;
+                    "
+                >
+                    {{ progress }} / {{ length }}
+                </div>
+            </div>
+        </div>
+        <script>
+            var source = new EventSource("/stream");
+            source.onmessage = function (event) {
+                var data = JSON.parse(event.data);
+
+                document.title = data.title;
+
+                if (data.url !== "") {
+                    document.getElementById("container").onclick = function () {
+                        window.open(data.url, "_blank");
+                    };
+                } else {
+                    document.getElementById("container").onclick = "";
+                }
+
+                const ac = document.getElementById("album-cover");
+                ac.src = data.cover;
+                ac.alt = data.title;
+
+                if (data.url !== "") {
+                    document.getElementById("song").textContent =
+                        data.artists + " - " + data.title;
+                } else {
+                    document.getElementById("song").textContent =
+                        "Not currently playing anything!";
+                }
+
+                document.getElementById("progress").textContent =
+                    data.progress + " / " + data.length;
+            };
+        </script>
+    </body>
+</html>
